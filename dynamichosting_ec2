@@ -1,0 +1,39 @@
+open terminal  cloud(ubuntu) 
+
+sudo chmod 400 labsuser.pem
+ssh -i labsuser.pem ubuntu@ec2-3-91-35-249.compute-1.amazonaws.com
+
+sudo apt-get update
+sudo apt-get install mysql-server mysql-client  php libapache2-mod-php php-mysql 
+sudo systemctl status apache2
+
+new terminal
+cd /var/www/html/
+scp -i /home/msis/Downloads/labsuser.pem -r ecommerce ubuntu@ec2-3-91-35-249.compute-1.amazonaws.com:/home/ubuntu/.
+
+again come to cloud(ubuntu) 
+ls
+sudo cp -rf ecommerce /var/www/html/.
+cd /var/www/html/
+sudo nano /etc/apache2/sites-available/000-default.conf 
+sudo systemctl restart apache2
+
+database part
+sudo mysql -u root -p
+show databases;
+create user 'msis'@'localhost' identified with mysql_native_password by 'Msis@123';
+create database ecommerce;
+grant all privileges on ecommerce.* to 'msis'@'localhost';
+exit;
+
+cd ecommerce/
+cd database/
+ls
+sudo mysql -u msis -p        //give password Msis@123
+use ecommerce;
+source onlineshop.sql;
+exit;
+cd ..
+sudo nano db.php
+//add ecommerce in document root
+sudo systemctl restart apache2
